@@ -1,5 +1,6 @@
-/* https://leetcode.com/problems/valid-mountain-array/ */
+/* 3 Easy Leetcode Problems completed on April 8, 2019 */
 
+/* https://leetcode.com/problems/valid-mountain-array/ */
 function validMountainArray(A) {
   const len = A.length;
   if (len < 3) return false;
@@ -22,7 +23,6 @@ function validMountainArray(A) {
 }
 
 /* https://leetcode.com/problems/smallest-range-i/ */
-
 function smallestRange(A, K) {
   const sum = A.reduce((sum, num) => sum + num, 0),
     average = Math.floor(sum / A.length),
@@ -46,8 +46,7 @@ function smallestRange(A, K) {
   return maxOfB - minOfB;
 }
 
-console.log(reverseOnlyLetters("Test1ng-Leet=code-Q!"));
-
+/* https://leetcode.com/problems/reverse-only-letters/ */
 function reverseOnlyLetters(S) {
   if (!S) return null;
   const letters = S.split("");
