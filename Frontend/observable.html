@@ -83,7 +83,7 @@
                   randomNumber >= 10
                     ? String.fromCharCode(randomNumber - 10 + "a".charCodeAt(0))
                     : randomNumber;
-              color += randomNumber;
+              color += hexDigit;
             }
             return `#${color}`;
           }
