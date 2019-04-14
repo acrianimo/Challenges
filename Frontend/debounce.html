@@ -1,0 +1,63 @@
+<!--The debounce concept demonstrated on a button-->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .flex-parent {
+        display: flex;
+      }
+      .flex--center-items {
+        justify-content: center;
+        align-items: center;
+      }
+      .parent {
+        height: 100vh;
+      }
+      .child {
+        width: 200px;
+        height: 100px;
+        border-radius: 20px;
+        background-color: orangered;
+        color: white;
+        transition: background-color 500ms;
+        font-size: 16px;
+      }
+      .child:hover {
+        background-color: red;
+        cursor: pointer;
+      }
+      .child:active {
+        transform: translateY(2px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="parent flex-parent flex--center-items">
+      <div class="child flex-parent flex--center-items">Click me!</div>
+    </div>
+    <script>
+      const clickObj = {
+        name: "clickObj",
+        method: function(e) {
+          console.log(`${this.name} clicked!`);
+        }
+      };
+
+      document
+        .querySelector(".child")
+        .addEventListener(
+          "click",
+          debounce(clickObj.method.bind(clickObj), 5000)
+        );
+
+      function debounce(callback, time) {
+        let timeout;
+        return e => {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => callback(e), time);
+        };
+      }
+    </script>
+  </body>
+</html>
