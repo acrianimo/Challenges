@@ -1,0 +1,117 @@
+<!--Demonstration of event bubbling-->
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      .wrapper,
+      .greatgrandparent,
+      .grandparent,
+      .parent {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .greatgrandparent,
+      .grandparent,
+      .parent,
+      .child {
+        position: relative;
+        opacity: 0.85;
+        transition: opacity 200ms;
+      }
+      .name {
+        display: none;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        top: 15px;
+        font-size: 16px;
+        letter-spacing: 1px;
+        color: red;
+      }
+      .wrapper {
+        height: 100vh;
+      }
+      .greatgrandparent {
+        width: 800px;
+        height: 800px;
+        background-color: green;
+      }
+      .grandparent {
+        width: 600px;
+        height: 600px;
+        background-color: greenyellow;
+      }
+      .parent {
+        width: 400px;
+        height: 400px;
+        background-color: gold;
+      }
+      .child {
+        width: 200px;
+        height: 200px;
+        background-color: yellow;
+      }
+      .greatgrandparent:hover {
+        opacity: 1;
+        cursor: pointer;
+      }
+      .greatgrandparent:hover .greatgrandparent-name {
+        display: block;
+      }
+      .grandparent:hover {
+        opacity: 1;
+        cursor: pointer;
+      }
+      .grandparent:hover .grandparent-name {
+        display: block;
+      }
+      .parent:hover {
+        opacity: 1;
+        cursor: pointer;
+      }
+      .parent:hover .parent-name {
+        display: block;
+      }
+      .child:hover {
+        opacity: 1;
+        cursor: pointer;
+      }
+      .child:hover .child-name {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="greatgrandparent">
+        <div class="greatgrandparent-name name">Great-Grandparent</div>
+        <div class="grandparent">
+          <div class="grandparent-name name">Grandparent</div>
+          <div class="parent">
+            <div class="parent-name name">Parent</div>
+            <div class="child">
+              <div class="child-name name">Child</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      ["greatgrandparent", "grandparent", "parent", "child"].forEach(
+        className => {
+          document
+            .querySelector(`.${className}`)
+            .addEventListener("click", () => alert(className));
+        }
+      );
+    </script>
+  </body>
+</html>
