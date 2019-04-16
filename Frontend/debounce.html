@@ -45,7 +45,7 @@
       };
 
       document
-        .querySelector(".child")
+        .getElementsByClassName("child")[0]
         .addEventListener(
           "click",
           debounce(clickObj.method.bind(clickObj), 5000)
