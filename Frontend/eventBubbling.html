@@ -108,7 +108,7 @@
       ["greatgrandparent", "grandparent", "parent", "child"].forEach(
         className => {
           document
-            .querySelector(`.${className}`)
+            .getElementsByClassName(`${className}`)[0]
             .addEventListener("click", () => alert(className));
         }
       );
