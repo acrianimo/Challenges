@@ -36,7 +36,7 @@
       .child:active {
         transform: translateY(2px);
       }
-      .verticle {
+      .vertical {
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: repeat(3, 1fr);
       }
@@ -58,20 +58,15 @@
       </div>
     </div>
     <script>
-      const parent = document.querySelector(".parent");
+      const parent = document.getElementsByClassName("parent")[0];
       parent.addEventListener("click", e => {
+        const {target} = e;
         if (
-          e.target.tagName === "DIV" &&
-          e.target.classList.contains("child")
+          target.tagName === "DIV" &&
+          target.className === "child" 
         ) {
-          const isParentHorizontal = parent.classList.contains("horizontal");
-          if (isParentHorizontal) {
-            parent.classList.remove("horizontal");
-            parent.classList.add("vertical");
-          } else {
-            parent.classList.remove("vertical");
-            parent.classList.add("horizontal");
-          }
+          const newParentClassName = parent.className.split(" ")[1] === "horizontal" ? "vertical" : "horizontal";
+          parent.className = `parent ${newParentClassName}`;
         }
       });
     </script>
