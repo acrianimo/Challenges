@@ -55,7 +55,7 @@
         let timeout;
         return e => {
           clearTimeout(timeout);
-          timeout = setTimeout(() => callback(e), time);
+          timeout = setTimeout(() => callback.call(this, e), time);
         };
       }
     </script>
