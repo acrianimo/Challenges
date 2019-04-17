@@ -64,6 +64,8 @@
         });
         const children = Array.from(document.querySelectorAll(".child"));
         children.forEach(child => {
+          // NOTE: This is not the best way to solve this problem, but this demonstrates 
+          // multiple subscribers to a single event 
           observable.subscribe("ChangeBackgroundColor", color => {
             child.style.backgroundColor = color;
           });
@@ -79,13 +81,16 @@
             let color = "";
             for (let i = 0; i < 6; i++) {
               const randomNumber = Math.floor(Math.random() * 16),
-                hexDigit =
-                  randomNumber >= 10
-                    ? String.fromCharCode(randomNumber - 10 + "a".charCodeAt(0))
-                    : randomNumber;
+                hexDigit = translateDecimalDigitToHexDigit(randomNumber);
               color += hexDigit;
             }
             return `#${color}`;
+            function translateDecimalDigitToHexDigit(decimalDigit) {
+              const hexDigit = decimalDigit >= 10
+                    ? String.fromCharCode(decimalDigit - 10 + "a".charCodeAt(0)).toUpperCase()
+                    : decimalDigit;
+              return hexDigit;
+            }
           }
         }
         function changeDirection(observable, event, time) {
