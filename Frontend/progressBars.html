@@ -1,0 +1,143 @@
+<!--Demonstraction of progress bars loading sequentially and in parallel-->
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <style>
+            .container {
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .progress-bars-container {
+                border: 5px solid orangered;
+                border-radius: 10px;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                width: 1000px;
+                height: 400px;
+            }
+
+            .progress-bar-container {
+                position: relative;
+                border: 2px solid green;
+                border-radius: 10px;
+                height: 50px;
+                overflow: hidden;
+            }
+
+            .progress-bar-container:hover {
+                cursor: pointer;
+            }
+
+            .progress-bar-container:active {
+                transform: translateY(2px);
+            }
+
+            .progress-bar {
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 0;
+                background-color: pink;
+            }
+
+            .progress {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                color: red;
+                letter-spacing: 2px;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="progress-bars-container">
+        </div>
+        <script>
+            const NUMBER_OF_PROGRESS_BARS = 5,
+                PROGRESS_BAR_WIDTH = 960;
+
+            const progressBarsProgress = createNProgressBars(NUMBER_OF_PROGRESS_BARS);
+
+            (function(){
+                const progressBarContainers = Array.from(document.querySelectorAll(".progress-bar-container"));
+                progressBarContainers.forEach((progressBarContainer, i) => {
+                    progressBarContainer.addEventListener("click", async (e) => {
+                        const progressBar = e.currentTarget.children[0],
+                            progress = progressBar.children[0];
+                        if (progress.innerText === "100%") {
+                            progressBar.style.width = "0";
+                            progress.innerText = "Loading...";
+                            progressBarsProgress[i] = 0;
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                            progress.innerText = "0%";
+                            await new Promise(resolve => setTimeout(resolve, 350));
+                            loadProgressBar(progressBarsProgress, i, 100);
+                        }
+                    });
+                });
+            })();
+
+            (async function(){
+                await Promise.all([loadProgressBar(progressBarsProgress, 0, 15), loadProgressBar(progressBarsProgress, 4, 29)]);
+                for await(const progressBarLoad of loadNProgressBarsToCompletion(NUMBER_OF_PROGRESS_BARS));
+            })();
+
+            async function* loadNProgressBarsToCompletion(n) {
+                for(let i = 0; i < n; i++) {
+                    yield loadProgressBar(progressBarsProgress, i, 100);
+                }
+            }
+
+            function loadProgressBar(progressBarProgress, i, percentageThreshold) {
+                return new Promise(resolve => {
+                    const timer = setInterval(function(){
+                            const randomNumber = Math.floor(Math.random() * 100),
+                                newNumber = progressBarProgress[i] + randomNumber,
+                                updatedProgress = newNumber > PROGRESS_BAR_WIDTH ? PROGRESS_BAR_WIDTH : newNumber,
+                                progressPercentage = Math.ceil((updatedProgress /PROGRESS_BAR_WIDTH) * 100);
+                            progressBarProgress[i] = updatedProgress;
+                            const element = document.getElementsByClassName(`progress-${i}`)[0];
+                            element.innerText = `${progressPercentage}%`;
+                            element.parentElement.style.width = `${progressPercentage}%`;
+                            if (progressPercentage >= percentageThreshold) {
+                                resolve();
+                                clearInterval(timer);
+                            }
+                        }, 100);
+                });
+            }
+
+            function createNProgressBars(n) {
+                const progressBarContainer = document.querySelector(".progress-bars-container");
+                for(let i = 0; i < n; i++) {
+                    const progressBar = createProgressBar(i);
+                    progressBarContainer.appendChild(progressBar);
+                }
+                function createProgressBar(number) {
+                    const progressBarContainer = document.createElement("div");
+                    progressBarContainer.className = `progress-bar-container progress-bar-container-${number}`;
+                    const progressBar = document.createElement("div");
+                    progressBar.className = `progress-bar progress-bar-${number}`;
+                    const progress = document.createElement("div");
+                    progress.className = `progress progress-${number}`;
+                    progressBarContainer.appendChild(progressBar);
+                    progressBar.appendChild(progress);
+                    progress.innerText = "0%";
+                    return progressBarContainer;
+                }
+                return new Array(n).fill(0);
+            }
+        </script>
+    </body>
+</html>
