@@ -32,6 +32,9 @@
         height: 85px;
         border-radius: 10px;
       }
+      .child:hover {
+        cursor: pointer;
+      }
       .vertical {
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: repeat(4, 1fr);
@@ -66,9 +69,11 @@
         children.forEach(child => {
           // NOTE: This is not the best way to solve this problem, but this demonstrates 
           // multiple subscribers to a single event 
-          observable.subscribe("ChangeBackgroundColor", color => {
+          const event = observable.subscribe("ChangeBackgroundColor", color => {
             child.style.backgroundColor = color;
           });
+          // TODO: Refactor into event delegation
+          child.addEventListener("click", () => event.release());
         });
         changeColor(observable, "ChangeBackgroundColor", 500);
         changeDirection(observable, "ChangeDirection", 3000);
