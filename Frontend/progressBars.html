@@ -94,115 +94,162 @@
             const NUMBER_OF_PROGRESS_BARS = 5,
                 PROGRESS_BAR_WIDTH = 960;
 
-            const progressBarsDetails = createNProgressBars(NUMBER_OF_PROGRESS_BARS);
+            const PROGRESS_BARS_DETAILS = createNProgressBars(NUMBER_OF_PROGRESS_BARS);
 
             (function(){
-                const progressBarContainers = Array.from(document.querySelectorAll(".progress-bar-container"));
-                progressBarContainers.forEach((progressBarContainer, i) => {
-                    progressBarContainer.addEventListener("click", async (e) => {
-                        const progress = document.getElementsByClassName(`progress-${i}`)[0],
-                            progressInputContainer = document.getElementsByClassName(`progress-input-container-${i}`)[0];
+                const progressBarsContainer = document.getElementsByClassName("progress-bars-container")[0];
+                progressBarsContainer.addEventListener("click", (e) => {
+                    const {className} = e.target,
+                        progressBarNumber = getProgressBarNumber(className);
+                    
+                    if (PROGRESS_BARS_DETAILS[progressBarNumber].isLoading) {
+                        return;
+                    }
 
-                        // The progress bar container is toggable for input when input exists or is not loading
-                        
-                        if (e.target.tagName !== "INPUT" && !progressBarsDetails[i].isLoading) {
-                            const isProgressInputContainerHidden = progressInputContainer.classList.contains("hidden-element");
-                            if (isProgressInputContainerHidden) {
-                                progressInputContainer.classList.remove("hidden-element");
-                                progress.classList.add("hidden-element");
-                            } else {
-                                progressInputContainer.classList.add("hidden-element");
-                                progress.classList.remove("hidden-element");
-                            }
-                        }
-                    });
+                    if (wasProgressBarClicked(className)) {
+                        handleProgressBarClick(progressBarNumber);
+                    } else if (className.startsWith("progress-submit-btn")) {
+                        handleProgressSubmitClick(progressBarNumber);
+                    }
                 });
+
+                function wasProgressBarClicked(className) {
+                    const classes = new Set(className.split(" ")),
+                        possibleProgressBarClassNames = [
+                            "progress-bar-container",
+                            "progress-bar",
+                            "progress",
+                            "progress-input-container"
+                        ],
+                        hasProgressBarClassName = possibleProgressBarClassNames.filter(className => classes.has(className)).length >= 1;
+                    return hasProgressBarClassName;
+                }
+
+                function getProgressBarNumber(className) {
+                    const sliceIndex = className.split("").lastIndexOf("-"),
+                        progressBarNumber = parseInt(className.slice(sliceIndex + 1));
+                    return progressBarNumber;
+                }
+
+                function handleProgressBarClick(progressBarNumber) {
+                    const {progress} = getProgressBarElementDetails(progressBarNumber),
+                            {progressInputContainer} = getProgressInputElementDetails(progressBarNumber),
+                            isProgressInputContainerHidden = progressInputContainer.classList.contains("hidden-element");
+
+                        if (isProgressInputContainerHidden) {
+                            progressInputContainer.classList.remove("hidden-element");
+                            progress.classList.add("hidden-element");
+                        } else {
+                            progressInputContainer.classList.add("hidden-element");
+                            progress.classList.remove("hidden-element");
+                        }
+                }
+
+                async function handleProgressSubmitClick(progressBarNumber) {
+                    const {progressInput, progressInputContainer} = getProgressInputElementDetails(progressBarNumber);
+                    let progressPercentageInput = parseInt(progressInput.value);
+                    
+                    if (isNaN(progressPercentageInput)) {
+                        alert("Invalid entry, try again.");
+                        return;
+                    }
+
+                    const {progressBarContainer, progressBar, progress} = getProgressBarElementDetails(progressBarNumber);
+
+                    progressPercentageInput = progressPercentageInput > 100 ? 100 : progressPercentageInput;
+
+                    progressInputContainer.classList.add("hidden-element");
+                    progressBar.style.width = "0";
+
+                    PROGRESS_BARS_DETAILS[progressBarNumber] = {isLoading: true, progress: 0, progressPercentage: 0};
+
+                    // TODO: Figure out why this is not being displayed
+                    progress.innerText = "Queuing job...";
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
+                    // TODO: Figure out why this is not being displayed
+                    progress.innerText = "0%";
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
+                    loadProgressBar(progressBarNumber, progressPercentageInput);
+
+                }
             })();
 
-            (function(){
-                const progressSubmitBtns = Array.from(document.getElementsByClassName("progress-submit-btn"));
-                progressSubmitBtns.forEach((progressSubmitBtn, i) => {
-                    progressSubmitBtn.addEventListener("click", async (e) => {
-                        const progressInput = document.getElementsByClassName(`progress-input-${i}`)[0];
-                        let progressPercentageInput = parseInt(progressInput.value);
+            (async function(){
+                await loadNProgressBarsInParallelToRandomPercentage(3);
+                for await(const progressBarLoad of loadNProgressBarsSequentiallyToCompletion(NUMBER_OF_PROGRESS_BARS));
 
-                        if (isNaN(progressPercentageInput)) {
-                            alert("Invalid entry, try again.");
-                            e.stopPropagation();
-                            return;
-                        }
+                function loadNProgressBarsInParallelToRandomPercentage(n) {
+                    const nProgressBarLoads = [],
+                        uniqueProgressBarNumbers = new Set();
 
-                        const progressInputContainer = document.getElementsByClassName(`progress-input-container-${i}`)[0],
-                            progressBarContainer = document.getElementsByClassName(`progress-bar-container-${i}`)[0],
-                            progressBar = document.getElementsByClassName(`progress-bar-${i}`)[0],
-                            progress = document.getElementsByClassName(`progress-${i}`)[0];
+                    n = n > NUMBER_OF_PROGRESS_BARS ? NUMBER_OF_PROGRESS_BARS : n;
+
+                    while (uniqueProgressBarNumbers.size < n) {
+                        const randomProgressBarNumber = Math.floor(Math.random()*NUMBER_OF_PROGRESS_BARS);
                         
-                        progressPercentageInput = progressPercentageInput > 100 ? 100 : progressPercentageInput;
+                        if (uniqueProgressBarNumbers.has(randomProgressBarNumber)) {
+                            continue;
+                        }
+                        const randomPercentageThreshold = Math.floor(Math.random()*45);
+                        nProgressBarLoads.push(loadProgressBar(randomProgressBarNumber, randomPercentageThreshold));
+                        uniqueProgressBarNumbers.add(randomProgressBarNumber);
+                    }
 
-                        progressInputContainer.classList.add("hidden-element");
-                        progressBar.style.width = "0";
+                    return Promise.all(nProgressBarLoads);
+                }
 
-                        progressBarsDetails[i] = {isLoading: true, progress: 0, progressPercentage: 0};
-
-                        progress.textContent = "Queuing job...";
-                        await new Promise(resolve => setTimeout(resolve, 500));
-
-                        progress.textContent = "0%";
-                        await new Promise(resolve => setTimeout(resolve, 500));
-
-                        loadProgressBar(progressBarsDetails, i, progressPercentageInput);
-                    });
-                });
+                async function* loadNProgressBarsSequentiallyToCompletion(n) {
+                    for(let i = 0; i < n; i++) {
+                        yield loadProgressBar(i, 100);
+                    }
+                }
             })();
 
-            // (async function(){
-            //     await loadNProgressBarsInParallelToRandomPercentage(3, progressBarsProgress);
-            //     for await(const progressBarLoad of loadNProgressBarsSequentiallyToCompletion(NUMBER_OF_PROGRESS_BARS));
-            // })();
+            function loadProgressBar(progressBarNumber, percentageThreshold) {
+                const {progressBarContainer, progressBar, progress} = getProgressBarElementDetails(progressBarNumber);
 
-            function loadNProgressBarsInParallelToRandomPercentage(n, progressBarsProgress) {
-                const nProgressBarLoads = [];
-                for(let i = 0; i < n; i++) {
-                    const randomProgressBarNumber = Math.floor(Math.random()*NUMBER_OF_PROGRESS_BARS),
-                        randomPercentage = Math.floor(Math.random()*45);
-                    nProgressBarLoads.push(loadProgressBar(progressBarsProgress, randomProgressBarNumber, randomPercentage));
-                }
-                return Promise.all(nProgressBarLoads);
-            }
-
-            async function* loadNProgressBarsSequentiallyToCompletion(n) {
-                for(let i = 0; i < n; i++) {
-                    yield loadProgressBar(progressBarsProgress, i, 100);
-                }
-            }
-
-            function loadProgressBar(progressBarsDetails, i, percentageThreshold) {
-                const progressBarContainer = document.getElementsByClassName(`progress-bar-container-${i}`)[0],
-                    progressBar = document.getElementsByClassName(`progress-bar-${i}`)[0],
-                    progress = document.getElementsByClassName(`progress-${i}`)[0];
-
-                progressBarsDetails[i] = Object.assign(progressBarsDetails[i], {isLoading: true});
+                PROGRESS_BARS_DETAILS[progressBarNumber] = Object.assign(PROGRESS_BARS_DETAILS[progressBarNumber], {isLoading: true});
 
                 return new Promise(resolve => {
                     const timer = setInterval(() => {
                             const progressIncrement = Math.floor(Math.random() * 100);
-                            let updatedProgress = progressBarsDetails[i].progress + progressIncrement;
+                            
+                            let updatedProgress = PROGRESS_BARS_DETAILS[progressBarNumber].progress + progressIncrement;
                             updatedProgress = updatedProgress > PROGRESS_BAR_WIDTH ? PROGRESS_BAR_WIDTH : updatedProgress;
+                            
                             let updatedProgressPercentage = Math.ceil((updatedProgress / PROGRESS_BAR_WIDTH) * 100);
                             updatedProgressPercentage = updatedProgressPercentage > percentageThreshold ? percentageThreshold : updatedProgressPercentage;
                             
-                            progressBarsDetails[i] = Object.assign(progressBarsDetails[i], {progress: updatedProgress, progressPercentage: updatedProgressPercentage});
+                            PROGRESS_BARS_DETAILS[progressBarNumber] = Object.assign(PROGRESS_BARS_DETAILS[progressBarNumber], {progress: updatedProgress, progressPercentage: updatedProgressPercentage});
 
-                            progress.textContent = `${updatedProgressPercentage}%`;
+                            progress.innerText = `${updatedProgressPercentage}%`;
                             progressBar.style.width = `${updatedProgressPercentage}%`;
                             
                             if (updatedProgressPercentage >= percentageThreshold) {
                                 clearInterval(timer);
-                                progressBarsDetails[i] = Object.assign(progressBarsDetails[i], {isLoading: false});
+                                PROGRESS_BARS_DETAILS[progressBarNumber] = Object.assign(PROGRESS_BARS_DETAILS[progressBarNumber], {isLoading: false});
                                 resolve();
                             }
                         }, 100);
                 });
+            }
+
+            function getProgressBarElementDetails(number) {
+                const progressBarContainer = document.getElementsByClassName(`progress-bar-container-${number}`)[0],
+                    progressBar = document.getElementsByClassName(`progress-bar-${number}`)[0],
+                    progress = document.getElementsByClassName(`progress-${number}`)[0],
+                    progressBarElementDetails = {progressBarContainer, progressBar, progress};
+                return progressBarElementDetails;
+            }
+
+            function getProgressInputElementDetails(number) {
+                const progressInputContainer = document.getElementsByClassName(`progress-input-container-${number}`)[0],
+                    progressInput = document.getElementsByClassName(`progress-input-${number}`)[0],
+                    progressSubmitBtn = document.getElementsByClassName(`progress-submit-btn-${number}`)[0],
+                    progressInputElementDetails = {progressInputContainer, progressInput, progressSubmitBtn};
+                return progressInputElementDetails;
             }
 
             function createNProgressBars(n) {
@@ -213,16 +260,18 @@
                     progressBarContainer.appendChild(progressBar);
                 }
                 
-                const progressBarsDetails = [... new Array(n)].map(progressBarDetails => {
-                    return {progressPercentage: 0, width: 0, isLoading: false}
+                const PROGRESS_BARS_DETAILS = [... new Array(n)].map(progressBarDetails => {
+                    return {progressPercentage: 0, progress: 0, isLoading: false}
                 });
 
-                return progressBarsDetails;
+                return PROGRESS_BARS_DETAILS;
                 
                 function createProgressBar(number) {
                     const progressBarContainer = createProgressBarContainer(number),
                         progressInputContainer = createProgressInputContainer(number);
-                    progressBarContainer.appendChild(progressInputContainer);
+                    
+                        progressBarContainer.appendChild(progressInputContainer);
+                    
                     return progressBarContainer;
 
                     function createProgressBarContainer(number) {
@@ -238,7 +287,7 @@
 
                         const progress = document.createElement("div");
                         progress.className = `${PROGRESS} ${PROGRESS}-${number}`;
-                        progress.textContent = "0%";
+                        progress.innerText = "0%";
 
                         progressBarContainer.appendChild(progressBar);
                         progressBar.appendChild(progress);
