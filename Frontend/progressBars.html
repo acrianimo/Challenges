@@ -159,16 +159,19 @@
                     progressPercentageInput = progressPercentageInput > 100 ? 100 : progressPercentageInput;
 
                     progressInputContainer.classList.add("hidden-element");
+                    progress.classList.remove("hidden-element");
+
                     progressBar.style.width = "0";
 
                     PROGRESS_BARS_DETAILS[progressBarNumber] = {isLoading: true, progress: 0, progressPercentage: 0};
 
-                    // TODO: Figure out why this is not being displayed
-                    progress.innerText = "Queuing job...";
+                    progress.textContent = "Preparing thrusters...";
                     await new Promise(resolve => setTimeout(resolve, 500));
 
-                    // TODO: Figure out why this is not being displayed
-                    progress.innerText = "0%";
+                    progress.textContent = `Will load gears to ${progressPercentageInput}%`;
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
+                    progress.textContent = "0%";
                     await new Promise(resolve => setTimeout(resolve, 500));
 
                     loadProgressBar(progressBarNumber, progressPercentageInput);
@@ -177,7 +180,8 @@
             })();
 
             (async function(){
-                await loadNProgressBarsInParallelToRandomPercentage(3);
+                const randomNumber = generateRandomNumber(NUMBER_OF_PROGRESS_BARS);
+                await loadNProgressBarsInParallelToRandomPercentage(randomNumber);
                 for await(const progressBarLoad of loadNProgressBarsSequentiallyToCompletion(NUMBER_OF_PROGRESS_BARS));
 
                 function loadNProgressBarsInParallelToRandomPercentage(n) {
@@ -205,6 +209,11 @@
                         yield loadProgressBar(i, 100);
                     }
                 }
+
+                function generateRandomNumber(n) {
+                    const randomNumber = Math.floor(Math.random()*n);
+                    return randomNumber;
+                }
             })();
 
             function loadProgressBar(progressBarNumber, percentageThreshold) {
@@ -224,7 +233,7 @@
                             
                             PROGRESS_BARS_DETAILS[progressBarNumber] = Object.assign(PROGRESS_BARS_DETAILS[progressBarNumber], {progress: updatedProgress, progressPercentage: updatedProgressPercentage});
 
-                            progress.innerText = `${updatedProgressPercentage}%`;
+                            progress.textContent = `${updatedProgressPercentage}%`;
                             progressBar.style.width = `${updatedProgressPercentage}%`;
                             
                             if (updatedProgressPercentage >= percentageThreshold) {
@@ -287,7 +296,7 @@
 
                         const progress = document.createElement("div");
                         progress.className = `${PROGRESS} ${PROGRESS}-${number}`;
-                        progress.innerText = "0%";
+                        progress.textContent = "0%";
 
                         progressBarContainer.appendChild(progressBar);
                         progressBar.appendChild(progress);
