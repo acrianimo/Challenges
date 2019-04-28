@@ -1,4 +1,4 @@
-/* Implementation of common sorting algorithms */
+/* Implementation of fundamental sorting algorithms */
 
 function bubbleSort(arr, comparator = (a, b) => a - b) {
     for(let i = 0; i < arr; i++) {
