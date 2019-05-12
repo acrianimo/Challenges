@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <style>
+            * {
+                padding: 0;
+                margin: 0;
+                box-sizing: border-box;
+            }
+
+            .container {
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .word-wrapper {
+                display: flex;
+            }
+
+            .coloredLetter {
+                font-size: 36px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="word-wrapper">
+        </div>
+        <script>
+            const colors = ["red", "blue", "yellow", "orange", "green"],
+                str = "Lorem ipsum dolo sit amet";
+
+            const wordWrapper = document.getElementsByClassName("word-wrapper")[0];
+
+            const coloredWords = createColoredWords(colors, str);
+
+            coloredWords.forEach(word => wordWrapper.appendChild(word));
+
+            function createColoredWords(colors, str) {
+                const words = str.split(" "),
+                    coloredWords = words.map((word, index) => {
+                        const coloredWord = createColoredWord(word, colors);
+                        if (index !== words.length - 1) {
+                            coloredWord.innerHTML = coloredWord.innerHTML + "&nbsp";
+                        }
+                        return coloredWord;
+                    });
+                return coloredWords;
+
+                function createColoredWord(word) {
+                    const coloredWord = document.createElement("DIV");
+                    coloredWord.className = "coloredWord";
+                    let index = 0;
+                    const letters = createColoredLetters(coloredWord, colors);
+                    letters.forEach(letter => coloredWord.appendChild(letter));
+                    return coloredWord;
+
+                    function createColoredLetters() {
+                        const coloredLetters = [];
+
+                        for(let i = 0; i < word.length; i++) {
+                            const letter = word[i];
+                            coloredLetters.push(createColoredLetter(colors[index++], letter));
+                            index = index === colors.length ? 0 : index;
+                        }
+
+                        return coloredLetters;
+
+                        function createColoredLetter(color, letter) {
+                            const coloredLetter = document.createElement("SPAN");
+                            coloredLetter.className = "coloredLetter";
+                            coloredLetter.textContent = letter;
+                            coloredLetter.style.color = color;
+                            return coloredLetter;
+                        }
+                    }
+                }
+            }
+        </script>
+    </body>
+</html>
