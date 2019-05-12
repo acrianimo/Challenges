@@ -1,0 +1,38 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <div class="main-container">
+            <div class="button">MY BUTTON</div>
+        </div>
+
+        <script src="https://unpkg.com/rxjs@6.5.1/bundles/rxjs.umd.min.js"></script>
+        <script>
+            // const {fromEvent} = rxjs;
+
+            // const button = document.getElementsByClassName("button")[0];
+
+            // const myObservable = fromEvent(button, "click"); // creates an observable to the button click event , now we can subscribers to this event by subscribing to the observable
+
+            // // Each subscription will create a new execution context... duh
+
+            // [... new Array(10)].forEach(_ => myObservable.subscribe(event => console.log(event)));
+            
+            // [... new Array(10)].forEach(_ => myObservable.subscribe({
+            //     next: event => console.log(event),
+            //     error: error => console.log(error),
+            //     complete: () => console.log("complete!")
+            // }));
+
+            const { range } = rxjs;
+            const { map, filter } = rxjs.operators;
+
+            const res = range(1, 200).pipe(
+            filter(x => x % 2 === 1),
+            map(x => x + x)
+            ).subscribe(x => console.log(x));
+
+            console.log(res);
+        </script>
+    </body>
+</html>

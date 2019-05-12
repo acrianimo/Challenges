@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<html>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        .wrapper {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .flex-parent {
+            display: flex;
+        }
+
+        .flex--center-items {
+            justify-content: center;
+            align-items: center;
+        }
+
+        .background-color-green {
+            background-color: green;
+        }
+
+        .background-color-black {
+            background-color: black;
+        }
+
+        .background-color-pink {
+            background-color: pink;
+        }
+
+        .color-orange {
+            color: orange;
+        }
+
+        .color-red {
+            color: red;
+        }
+
+        .color-pink {
+            color: pink;
+        }
+
+        .fontSizeWebXs {
+            font-size: 12px;
+        }
+
+        .fontSizeWebSm  {
+            font-size: 14px;
+        }
+
+        .fontSizeWebMd {
+            font-size: 16px;
+        }
+
+        .fontSizeWebXl4 {
+            font-size: 44px;
+        }
+
+    </style>
+    <body>
+        <div class="wrapper">
+            <div id="container">Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque, cum!</div>
+        </div>
+        <script>
+            $(".wrapper").addClass("flex-parent", "flex--center-items").addClass("background-color-pink");
+            $("#container").addClass("background-color-black", "fontSizeWebXl4").addClass("color-orange");
+
+            function $(selector) {
+                const elements = Array.from(document.querySelectorAll(selector.trim()));
+
+                const methods = {
+                    addClass: function(...classNames) {
+                        return modifyElementsClasses(elements, classNames, "add");
+                    },
+                    removeClass: function(...classNames) {
+                        return modifyElementsClasses(elements, classNames, "remove");
+                    }
+                };
+
+                function modifyElementsClasses(elements, classNames, action) {
+                    elements.forEach(element => {
+                        classNames.forEach(className => element.classList[action](className));
+                    });
+                    return methods;
+                }
+
+                return methods;
+            }
+        </script>
+    </body>
+</html>
