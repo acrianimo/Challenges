@@ -1,5 +1,6 @@
 /* 4 Easy Daily Coding problems completed on May 13, 2019 */
 
+/* https://www.geeksforgeeks.org/program-for-nth-fibonacci-number/ */
 function getNthFib(n) {
     if (n === 1) {
         return 0;
@@ -14,9 +15,10 @@ function getNthFib(n) {
         b = c;
     }
 
-    return b;
+    return a;
 }
 
+/* https://leetcode.com/problems/maximum-product-of-three-numbers/ */
 function largestProduct(list) {
     const len = list.length;
     
@@ -32,6 +34,7 @@ function largestProduct(list) {
     return Math.max(case1, case2);
 }
 
+/* https://www.algoexpert.io/questions/River%20Sizes */
 function riverSizes(matrix) {
     const riverSizes = [];
     
@@ -64,6 +67,7 @@ function riverSizes(matrix) {
     }
 }
 
+/* https://leetcode.com/problems/encode-and-decode-tinyurl/ */
 function urlShortener() {
     const urlToShort = {},
         shortToUrl = {};
