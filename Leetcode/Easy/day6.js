@@ -1,5 +1,6 @@
 /* 3 Easy Daily Coding problems completed on May 12, 2019 */
 
+/* https://www.geeksforgeeks.org/find-deepest-node-binary-tree/ */
 function deepestLevelNode(node) {
     if (!node) {
         return null;
@@ -26,6 +27,7 @@ function deepestLevelNode(node) {
     }
 }
 
+/* https://leetcode.com/problems/merge-intervals/ */
 function mergeIntervals(intervals) {
     if (!intervals) {
         return null;
@@ -49,6 +51,7 @@ function mergeIntervals(intervals) {
     return mergedIntervals;
 }
 
+/* https://www.geeksforgeeks.org/n-th-number-whose-sum-of-digits-is-ten/ */
 function nthPerfectNumber(n) {
     let perfectNumberIndex = 0
         currNum = 0,
